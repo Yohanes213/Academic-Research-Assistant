@@ -1,0 +1,8 @@
+apache-airflow==2.7.1
+apache-airflow-providers-docker
+requests
+beautifulsoup4
+pandas
+fastapi
+uvicorn
+# apache-airflow-providers-http

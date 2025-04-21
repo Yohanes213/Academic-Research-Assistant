@@ -1,0 +1,8 @@
+# sentence_transformers
+# chromadb
+langchain
+pinecone-client
+langchain-pinecone
+fastapi
+uvicorn
+python-dotenv

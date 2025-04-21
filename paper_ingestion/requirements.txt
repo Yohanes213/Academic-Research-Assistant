@@ -2,3 +2,4 @@ BeautifulSoup4
 requests
 fastapi
 uvicorn
+httpx

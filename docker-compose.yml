@@ -7,15 +7,14 @@ x-airflow-common: &airflow-common
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
-    - ../paper_ingestion:/opt/airflow/paper_ingestion
-    - ../paper_ingestion/output:/opt/airflow/paper_ingestion/output
+    - ./paper_ingestion:/opt/airflow/paper_ingestion
   depends_on:
     &airflow-common-depends-on
     postgres:
@@ -23,6 +22,7 @@ x-airflow-common: &airflow-common
 
 services:
   postgres:
+    container_name: postgres
     image: postgres:13
     environment:
       POSTGRES_USER: airflow
@@ -36,11 +36,14 @@ services:
 
   airflow-init:
     <<: *airflow-common
+    container_name: airflow-init
     entrypoint: /bin/bash
     command: -c "airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.com"
+    #&& airflow connections add 'paper_ingestion_http' --conn-type 'http' --conn-host 'http://paper-ingestion:8000'"
 
   airflow-webserver:
     <<: *airflow-common
+    container_name: airflow-webserver
     command: webserver
     ports:
       - "8080:8080"
@@ -56,6 +59,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    container_name: airflow-scheduler
     command: scheduler
     depends_on:
       airflow-init:
@@ -63,6 +67,7 @@ services:
     restart: always
 
   paper-ingestion:
+    container_name: paper-ingestion
     build:
       context: ./paper_ingestion
       dockerfile: Dockerfile
@@ -70,15 +75,32 @@ services:
       - "8000:8000"
     volumes:
       - ./paper_ingestion:/app
-      - ./paper_ingestion/output:/app/output
     environment:
-      - OUTPUT_DIR=/app/output
+      - VECTOR_DB_URL=http://vector-db:5000
     depends_on:
       - airflow-webserver
+      - vector-db
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
-  # Optional: You can add a health check for the paper-ingestion service if required
-  # healthcheck:
-  #   test: ["CMD", "curl", "--fail", "http://localhost:8000/health"]
-  #   interval: 10s
-  #   retries: 5
+  vector-db:
+    container_name: vector-db
+    build:
+      context: ./vector_db
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./vector_db:/app
+    environment:
+      - PINECONE_API_KEY=pcsk_3wf9nz_BH2qQXhcad69GzuxZjte2mMvJyPGf8zizk2Kosv3UrfSLhUBg8YT1cJDtcdxiqq
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

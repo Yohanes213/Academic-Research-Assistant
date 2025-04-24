@@ -9,7 +9,7 @@ router = APIRouter()
 @router.get("/health")
 async def health_check():
     try:
-        index.describe_index_stats(index_name)
+        # index.describe_index_stats(index_name)
         return {"status": "healthy"}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
@@ -38,3 +38,34 @@ async def check_id_exists(pmid: str) -> bool:
     )
     
     return bool(res.vectors and record_id in res.vectors)
+
+# @router.get("/query")
+# async def query_data(query: str, top_k: int = 5):
+#     print(f"Received query: {query}, top_k: {top_k}")
+#     results = index.search(
+#             namespace=index_name,
+#             query={
+#                 "inputs": {"text": query}, 
+#                 "top_k": top_k
+#             }
+#         )
+#     print(results)
+#     return results
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/query")
+async def query_data(query: str, top_k: int = 5):
+    results = index.search(
+        namespace=index_name,
+        query={"inputs": {"text": query}, "top_k": top_k},
+    )
+    hits = results.result["hits"]
+    return [
+        {
+          "id":    hit["_id"],
+          "score": hit["_score"],
+          **hit["fields"]
+        }
+        for hit in hits
+    ]

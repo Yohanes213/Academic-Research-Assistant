@@ -14,7 +14,7 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(seconds=10),
     'start_date': datetime(2025, 4, 21),
-    'schedule_interval': '@daily',
+    'schedule_interval': '@weekly',
     'catchup': False
 }
 

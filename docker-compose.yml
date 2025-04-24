@@ -96,8 +96,9 @@ services:
       - "5000:5000"
     volumes:
       - ./vector_db:/app
+      - ./vector_db/.env:/app/.env
     environment:
-      - PINECONE_API_KEY=pcsk_3wf9nz_BH2qQXhcad69GzuxZjte2mMvJyPGf8zizk2Kosv3UrfSLhUBg8YT1cJDtcdxiqq
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5000/health"]

@@ -1,4 +1,4 @@
-from scrapper import extract_articles, parse_article_info, fetch_article_details
+from scraper import extract_articles, parse_article_info, fetch_article_details
 from fastapi import FastAPI
 import httpx
 from pydantic import BaseModel
@@ -81,7 +81,7 @@ async def scrape_articles():
                 
                 if await check_article_exists(article["pmid"]):
                     logger.info(f"Article {article['pmid']} already exists in vector DB, skipping...")
-                    continue
+                    break
                 # Send to vector DB
                 if await send_to_vector_db(article):
                     success_count += 1

@@ -1,116 +1,128 @@
 # Academic Research Assistant
 
-A distributed system for collecting, processing, and analyzing academic research papers. The system consists of multiple microservices orchestrated using Docker Compose and Apache Airflow.
+An AI-powered system that helps researchers explore and analyze academic papers. The system automatically scrapes papers from PubMed, processes them, and provides intelligent responses to research queries.
 
-## System Architecture
+## System Overview
 
-The system consists of the following main components:
+1. **Paper Ingestion Service** (Port 8000)
+   - Automatically scrapes trending papers from PubMed
+   - Extracts metadata and content
+   - Processes papers for vector storage
 
-### 1. Paper Ingestion Service
-- Located in `/paper_ingestion`
-- A FastAPI service that scrapes PubMed's trending papers
-- Features:
-  - Automated scraping of trending articles from PubMed
-  - Article metadata extraction
-  - Integration with Vector DB service for storage
-  - Health check endpoints
-  - Automatic deduplication of articles
+2. **Vector Database Service** (Port 5000)
+   - Uses Pinecone for efficient vector storage
+   - Enables semantic search across papers
+   - Handles document deduplication
 
-### 2. Vector Database Service
-- Located in `/vector_db`
-- A FastAPI service that manages the vector database (using Pinecone)
-- Features:
-  - Document storage and retrieval
-  - Vector similarity search
-  - Document existence checking
-  - Health monitoring
+3. **Research Assistant** (Port 5001)
+   - Powered by Google's Gemini
+   - Provides intelligent research insights
+   - Uses Tavily for enhanced web search
 
-### 3. Airflow Orchestration
-- Located in `/airflow`
-- Manages scheduled tasks and workflow orchestration
-- Features:
-  - Weekly paper ingestion scheduling
-  - Task retry mechanisms
-  - Monitoring and logging
-  - Web interface for task management
+4. **Airflow** (Port 8080)
+   - Schedules weekly paper ingestion
+   - Manages the data pipeline
+   - Provides task monitoring
 
-### 4. Research Agent (In Development)
-- Located in `/research_agent`
-- Future service for intelligent research assistance
-- Currently in initial development phase
+## Setup Guide
 
-## Prerequisites
+1. API Keys Setup:
+   ```bash
+   # In vector_db/.env
+   PINECONE_API_KEY=your_pinecone_key
+
+   # In research_assistant/.env
+   GOOGLE_API_KEY=your_gemini_key
+   TAVILY_API_KEY=your_tavily_key
+   LANGSMITH_API_KEY=your_langsmith_key  # Optional
+   ```
+
+2. Start Services:
+   ```bash
+   docker-compose up -d
+   ```
+
+3. Access Points:
+   - Airflow Dashboard: http://localhost:8080 
+     - Username: admin
+     - Password: admin
+   - Research Assistant: http://localhost:5001
+   - Paper Ingestion: http://localhost:8000
+   - Vector DB: http://localhost:5000
+
+## Key Features
+
+- **Automated Paper Collection**: Weekly scraping of trending PubMed papers
+- **Intelligent Research Assistance**: AI-powered research insights using Google's Gemini
+- **Semantic Search**: Find relevant papers using natural language queries
+- **Scalable Architecture**: Microservices design with Docker containerization
+
+## API Endpoints
+
+### Research Assistant
+- `POST /response`
+  ```json
+  {
+    "query": "What are the latest findings in COVID-19 treatment?",
+    "top_k": 5,
+    "needs_search": true
+  }
+  ```
+
+### Paper Ingestion
+- `GET /scrape`: Trigger manual paper collection
+- `GET /health`: Service health check
+
+### Vector DB
+- `POST /upsert`: Add new papers
+- `GET /query`: Search papers
+- `POST /check_id`: Check paper existence
+
+## Requirements
 
 - Docker and Docker Compose
-- Python 3.8+
-- Pinecone API Key
-
-## Environment Variables
-
-The following environment variables need to be set:
-
-```env
-PINECONE_API_KEY=your_pinecone_api_key
-VECTOR_DB_URL=http://vector-db:5000 (default in docker-compose)
-```
-
-## Getting Started
-
-1. Clone the repository:
-```bash
-git clone https://github.com/Yohanes213/Academic-Research-Assistant
-cd Academic-Research-Assistant
-```
-
-2. Set up environment variables:
-   - Create a `.env` file in the root directory
-   - Add your Pinecone API key
-
-3. Start the services:
-```bash
-docker-compose up -d
-```
-
-4. Access the services:
-- Airflow UI: http://localhost:8080 (username: admin, password: admin)
-- Paper Ingestion API: http://localhost:8000
-- Vector DB API: http://localhost:5000
-
-## Service Endpoints
-
-### Paper Ingestion Service
-- `GET /health`: Health check endpoint
-- `GET /scrape`: Trigger paper scraping process
-
-### Vector DB Service
-- `GET /health`: Health check endpoint
-- `POST /upsert`: Add or update documents
-- `POST /check_id`: Check if a document exists
-- `GET /query`: Query documents by similarity
+- API Keys:
+  - [Pinecone](https://www.pinecone.io/) for vector storage
+  - [Google AI Studio](https://aistudio.google.com/app/apikey) for Gemini
+  - [Tavily](https://app.tavily.com/home) for web search
+  - [LangSmith](https://smith.langchain.com/) (optional) for LLM monitoring
 
 ## Development
 
-Each service can be developed independently:
+For local development of individual services:
 
-1. Paper Ingestion Service:
 ```bash
+# Paper Ingestion Service
 cd paper_ingestion
 pip install -r requirements.txt
-uvicorn main:app --reload
-```
+uvicorn main:app --reload --port 8000
 
-2. Vector DB Service:
-```bash
+# Vector DB Service
 cd vector_db
 pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn main:app --reload --port 5000
+
+# Research Assistant
+cd research_assistant
+pip install -r requirements.txt
+uvicorn main:app --reload --port 5001
 ```
 
-## Monitoring and Maintenance
+## Monitoring
 
-- Airflow logs are available in `/airflow/logs`
-- Each service includes health check endpoints
-- Docker container logs can be viewed using `docker logs [container-name]`
+- View service logs: `docker logs <container-name>`
+- Check Airflow tasks: http://localhost:8080/admin/
+- Service health endpoints: `/health`
+
+## Project Structure
+
+```
+.
+├── airflow/              # Airflow DAGs and configurations
+├── paper_ingestion/      # Paper processing service
+├── vector_db/           # Vector database service
+└── research_assistant/  # Research query processing service
+```
 
 ## Future Development
 

@@ -96,12 +96,34 @@ services:
       - "5000:5000"
     volumes:
       - ./vector_db:/app
-      - ./vector_db/.env:/app/.env
+    env_file:
+      - ./vector_db/.env
     environment:
-      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_API_KEY
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  research-assistant:
+    container_name: research-assistant
+    build:
+      context: ./research_assistant
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./research_assistant:/app
+    environment:
+      - VECTOR_DB_URL=http://vector-db:5000
+    depends_on:
+      - paper-ingestion
+      - vector-db
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5001/health"]
       interval: 10s
       timeout: 5s
       retries: 3

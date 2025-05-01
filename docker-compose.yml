@@ -127,3 +127,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - RESEARCH_ASSISTANT_URL=http://research-assistant:5001
+      - PAPER_INGESTION_URL=http://paper-ingestion:8000
+      - VECTOR_DB_URL=http://vector-db:5000
+    depends_on:
+      - research-assistant
+      - paper-ingestion
+      - vector-db
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

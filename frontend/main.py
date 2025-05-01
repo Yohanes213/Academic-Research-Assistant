@@ -8,7 +8,7 @@ load_dotenv()
 
 # Configure page
 st.set_page_config(
-    page_title="ScholarChat",
+    page_title="Academic Research Assistant",
     page_icon="📚",
     layout="wide"
 )
@@ -59,8 +59,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.title("ScholarChat")
-page = st.sidebar.radio("Menu", ["Chat", "Paper Search", "System Status"])
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Research Assistant", "Paper Search", "System Status"])
 
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
@@ -91,8 +91,8 @@ if page == "System Status":
         )
 
 # Research Assistant Section
-elif page == "Chat":
-    st.title("Chat")
+elif page == "Research Assistant":
+    st.title("Research Assistant")
     
     # Display chat history
     for message in st.session_state.messages:
@@ -165,4 +165,3 @@ elif page == "Paper Search":
 
 # Footer
 st.sidebar.markdown("---")
-st.sidebar.markdown("ScholarChat © 2024")

@@ -1,25 +1,34 @@
 # Academic Research Assistant
 
-An AI-powered system that helps researchers explore and analyze academic papers. The system automatically scrapes papers from PubMed, processes them, and provides intelligent responses to research queries.
+An AI-powered system that helps researchers explore and analyze academic papers. The system automatically scrapes papers from PubMed, processes them, and provides intelligent responses to research queries through an intuitive web interface.
+
+## Demo
 
 ## System Overview
 
-1. **Paper Ingestion Service** (Port 8000)
+
+1. **Frontend** (Port 8501)
+   - Modern web interface built with Streamlit
+   - Chat-based research assistant interface
+   - Paper search functionality
+   - System status monitoring
+
+2. **Paper Ingestion Service** (Port 8000)
    - Automatically scrapes trending papers from PubMed
    - Extracts metadata and content
    - Processes papers for vector storage
 
-2. **Vector Database Service** (Port 5000)
+3. **Vector Database Service** (Port 5000)
    - Uses Pinecone for efficient vector storage
    - Enables semantic search across papers
    - Handles document deduplication
 
-3. **Research Assistant** (Port 5001)
+4. **Research Assistant** (Port 5001)
    - Powered by Google's Gemini
    - Provides intelligent research insights
    - Uses Tavily for enhanced web search
 
-4. **Airflow** (Port 8080)
+5. **Airflow** (Port 8080)
    - Schedules weekly paper ingestion
    - Manages the data pipeline
    - Provides task monitoring
@@ -35,6 +44,11 @@ An AI-powered system that helps researchers explore and analyze academic papers.
    GOOGLE_API_KEY=your_gemini_key
    TAVILY_API_KEY=your_tavily_key
    LANGSMITH_API_KEY=your_langsmith_key  # Optional
+
+   # In frontend/.env
+   RESEARCH_ASSISTANT_URL=http://research-assistant:5001
+   PAPER_INGESTION_URL=http://paper-ingestion:8000
+   VECTOR_DB_URL=http://vector-db:5000
    ```
 
 2. Start Services:
@@ -43,6 +57,7 @@ An AI-powered system that helps researchers explore and analyze academic papers.
    ```
 
 3. Access Points:
+   - Frontend Interface: http://localhost:8501
    - Airflow Dashboard: http://localhost:8080 
      - Username: admin
      - Password: admin
@@ -52,6 +67,7 @@ An AI-powered system that helps researchers explore and analyze academic papers.
 
 ## Key Features
 
+- **User-Friendly Interface**: Modern chat-based interface for research queries
 - **Automated Paper Collection**: Weekly scraping of trending PubMed papers
 - **Intelligent Research Assistance**: AI-powered research insights using Google's Gemini
 - **Semantic Search**: Find relevant papers using natural language queries
@@ -92,6 +108,11 @@ An AI-powered system that helps researchers explore and analyze academic papers.
 For local development of individual services:
 
 ```bash
+# Frontend Service
+cd frontend
+pip install -r requirements.txt
+streamlit run main.py
+
 # Paper Ingestion Service
 cd paper_ingestion
 pip install -r requirements.txt
@@ -118,10 +139,11 @@ uvicorn main:app --reload --port 5001
 
 ```
 .
-├── airflow/              # Airflow DAGs and configurations
-├── paper_ingestion/      # Paper processing service
-├── vector_db/           # Vector database service
-└── research_assistant/  # Research query processing service
+├── frontend/           # Web interface
+├── airflow/           # Airflow DAGs and configurations
+├── paper_ingestion/   # Paper processing service
+├── vector_db/         # Vector database service
+└── research_assistant/# Research query processing service
 ```
 
 ## Future Development
@@ -149,3 +171,6 @@ Please make sure to:
 ## License
 
 This project is licensed under the MIT License - see below for details:
+
+
+

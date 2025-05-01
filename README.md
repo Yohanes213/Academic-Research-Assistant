@@ -3,6 +3,7 @@
 An AI-powered system that helps researchers explore and analyze academic papers. The system automatically scrapes papers from PubMed, processes them, and provides intelligent responses to research queries through an intuitive web interface.
 
 ## Demo
+![Demo](https://github.com/user-attachments/assets/98689b34-a26a-44e6-a340-384f85d78a79)
 
 ## System Overview
 

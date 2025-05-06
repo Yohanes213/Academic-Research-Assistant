@@ -17,7 +17,7 @@ _set_env("LANGSMITH_API_KEY")
 load_dotenv()
 
 os.environ["LANGSMITH_TRACING"] = "true"
-os.environ["LANGSMITH_PROJECT"] = "langchain-academy"
+os.environ["LANGSMITH_PROJECT"] = "research-assistantant"
 
 # Initialize thread ID and config once
 thread_id = uuid.uuid4().hex

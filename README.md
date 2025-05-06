@@ -30,6 +30,7 @@ An AI-powered system that helps researchers explore and analyze academic papers.
    - Powered by Google's Gemini
    - Provides intelligent research insights
    - Uses Tavily for enhanced web search
+   - Integrated with LangSmith for monitoring and debugging
 
 5. **Airflow** (Port 8080)
    - Schedules weekly paper ingestion
@@ -46,7 +47,9 @@ An AI-powered system that helps researchers explore and analyze academic papers.
    # In research_assistant/.env
    GOOGLE_API_KEY=your_gemini_key
    TAVILY_API_KEY=your_tavily_key
-   LANGSMITH_API_KEY=your_langsmith_key  # Optional
+   LANGSMITH_API_KEY=your_langsmith_key  # Required for LLM monitoring
+   LANGSMITH_PROJECT=your_project_name    # Or your preferred project name
+   LANGSMITH_TRACING=true                # Enable tracing
 
    # In frontend/.env
    RESEARCH_ASSISTANT_URL=http://research-assistant:5001
@@ -67,6 +70,7 @@ An AI-powered system that helps researchers explore and analyze academic papers.
    - Research Assistant: http://localhost:5001
    - Paper Ingestion: http://localhost:8000
    - Vector DB: http://localhost:5000
+   - LangSmith Dashboard: https://smith.langchain.com/
 
 ## Key Features
 
@@ -104,7 +108,7 @@ An AI-powered system that helps researchers explore and analyze academic papers.
   - [Pinecone](https://www.pinecone.io/) for vector storage
   - [Google AI Studio](https://aistudio.google.com/app/apikey) for Gemini
   - [Tavily](https://app.tavily.com/home) for web search
-  - [LangSmith](https://smith.langchain.com/) (optional) for LLM monitoring
+  - [LangSmith](https://smith.langchain.com/) for LLM monitoring and debugging
 
 ## Development
 
@@ -137,6 +141,7 @@ uvicorn main:app --reload --port 5001
 - View service logs: `docker logs <container-name>`
 - Check Airflow tasks: http://localhost:8080/admin/
 - Service health endpoints: `/health`
+- LLM Monitoring: Access your LangSmith dashboard at https://smith.langchain.com/
 
 ## Project Structure
 

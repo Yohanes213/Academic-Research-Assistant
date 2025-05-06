@@ -1,3 +1,5 @@
+![System Architecture](https://github.com/user-attachments/assets/fc68796a-69cb-434a-8af8-19507d1392ad)
+
 # Academic Research Assistant
 
 An AI-powered system that helps researchers explore and analyze academic papers. The system automatically scrapes papers from PubMed, processes them, and provides intelligent responses to research queries through an intuitive web interface.

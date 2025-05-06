@@ -4,19 +4,31 @@ from nodes.retrieve import retrieve_node
 from nodes.evaluate import evaluate_context_node
 from nodes.web_search import web_search_node
 from nodes.response import response_node
+from nodes.conversation import conversation_node
+from langgraph.checkpoint.memory import InMemorySaver
+
+memory = InMemorySaver()
+
 
 def build_graph():
     graph = StateGraph(State)
 
-    graph.add_node("retrieve", retrieve_node)
-    graph.add_node("evaluate", evaluate_context_node)
-    graph.add_node("web_search", web_search_node)
-    graph.add_node("response", response_node)
+    # Add all nodes
+    graph.add_node("conversation_node", conversation_node)
+    graph.add_node("retrieve_node", retrieve_node)
+    graph.add_node("evaluate_node", evaluate_context_node)
+    graph.add_node("web_search_node", web_search_node)
+    graph.add_node("response_node", response_node)
 
-    graph.add_edge(START, "retrieve")
-    graph.add_edge("retrieve", "evaluate")
-    graph.add_edge("evaluate", "web_search")
-    graph.add_edge("web_search", "response")
-    graph.add_edge("response", END)
+    # Add edges with conditional routing
+    graph.add_edge(START, "conversation_node")
+    graph.add_conditional_edges(
+        "conversation_node",
+        lambda state: END if state.response else "retrieve_node"
+    )
+    graph.add_edge("retrieve_node", "evaluate_node")
+    graph.add_edge("evaluate_node", "web_search_node")
+    graph.add_edge("web_search_node", "response_node")
+    graph.add_edge("response_node", END)
 
-    return graph.compile()
+    return graph.compile(checkpointer=memory)

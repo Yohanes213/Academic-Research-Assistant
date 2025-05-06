@@ -1,22 +1,20 @@
-from pydantic import BaseModel, Field
+# state.py
 from langchain_core.messages import AnyMessage
-from typing import Annotated, TypedDict, List
+from pydantic import BaseModel, Field
+from typing import List, Annotated
 from langgraph.graph.message import add_messages
 
-class State(TypedDict):
-    query: str
-    top_k: int
-    context: str
-    results: str
-    needs_search: bool
-    search_results: str
-
-class Query(BaseModel):
-    query: str = Field(..., description="The query to be answered.")
-    top_k: int = Field(5, description="The number of top results to return.")
-    context: str = Field("", description="Retrieved context for the LLM.")
-    needs_search: bool = Field(False, description="Whether additional search is needed")
-    search_results: str = Field("", description="Results from web search")
-
-class Output(BaseModel):
-    results: str = Field(..., description="The generated answer from the LLM.")
+class State(BaseModel):
+    messages: Annotated[List[AnyMessage], add_messages] = Field(
+        default_factory=list,
+        description="Chat message history with user and AI messages"
+    )
+    
+    query: str = Field(..., description="Current user query")
+    
+    context: str = Field("", description="Retrieved document context")
+    search_results: str = Field("", description="Web search results")
+    
+    needs_search: bool = Field(False, description="Flag for web search need")
+    top_k: int = Field(1, description="Number of top results to consider")
+    response: str = Field("", description="Generated AI response")

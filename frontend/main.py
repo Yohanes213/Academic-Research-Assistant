@@ -122,7 +122,8 @@ elif page == "Research Assistant":
                         params={
                             "query": query,
                             "needs_search": needs_search
-                        }
+                        },
+                        json={"chat_history": st.session_state.messages}  # Send chat history as JSON
                     )
                     if response.status_code == 200:
                         result = response.json()

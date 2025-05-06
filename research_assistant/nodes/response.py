@@ -1,7 +1,9 @@
 from config import llm
-from state import Query, Output
+from state import State
+from langchain_core.messages import AIMessage
 
-def response_node(state: Query) -> Output:
+
+def response_node(state: State) -> dict:
     answer_prompt = f"""
     You are a helpful assistant. Answer the question using ALL the information provided in the context below.
     You must consider and synthesize information from BOTH retrieved documents and web search results when available.
@@ -26,4 +28,7 @@ def response_node(state: Query) -> Output:
     gen = llm.invoke([answer_prompt])
     msg = gen[0] if isinstance(gen, list) else gen
 
-    return Output(results=msg.content)
+    return {
+        "messages": [AIMessage(content=msg.content)],
+        "response": msg.content
+    }

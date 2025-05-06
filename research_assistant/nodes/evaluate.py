@@ -1,7 +1,7 @@
 from config import llm
-from state import Query
+from state import State
 
-def evaluate_context_node(state: Query) -> dict:
+def evaluate_context_node(state: State) -> dict:
     if state.needs_search:
         return {"needs_search": True}
 
